@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -14,20 +16,26 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+type myConfig struct {
+	Count int      `json:"count"`
+	Name  string   `json:"name"`
+	Fruit []string `json:"fruit"`
+}
+
 func main() {
 
 	e := echo.New()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	mySession := session.Must(session.NewSession())
+	mySession := session.Must(session.NewSession(&aws.Config{
+		Region: aws.String("us-east-1")}))
 	svc := appconfig.New(mySession)
 	input := &appconfig.GetConfigurationInput{
-		Application:                aws.String("newConfigApp"),
-		ClientId:                   aws.String(uuid.NewString()),
-		Configuration:              aws.String("TestConfig1"),
-		Environment:                aws.String("Prod"),
-		ClientConfigurationVersion: aws.String("1"),
+		Application:   aws.String("newConfigApp"),
+		ClientId:      aws.String(uuid.NewString()),
+		Configuration: aws.String("TestConfig1"),
+		Environment:   aws.String("Prod"),
 	}
 
 	result, err := svc.GetConfiguration(input)
@@ -60,7 +68,9 @@ func main() {
 	})
 
 	e.GET("/testconfig", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, "My name is: "+*result.ConfigurationVersion)
+		var config myConfig
+		json.Unmarshal(result.Content, &config)
+		return c.HTML(http.StatusOK, config.Name+" has "+strconv.Itoa(config.Count)+" apples, but he prefers "+config.Fruit[0]+" and "+config.Fruit[1])
 	})
 
 	httpPort := os.Getenv("HTTP_PORT")
