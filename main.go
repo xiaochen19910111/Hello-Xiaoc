@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	session "github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/appconfig"
-	"github.com/google/uuid"
+// 	"github.com/aws/aws-sdk-go/aws"
+// 	"github.com/aws/aws-sdk-go/aws/awserr"
+// 	session "github.com/aws/aws-sdk-go/aws/session"
+// 	"github.com/aws/aws-sdk-go/service/appconfig"
+// 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
